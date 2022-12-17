@@ -1,0 +1,35 @@
+{
+  "name": "data-structures",
+  "version": "1.0.0",
+  "description": "data-structures",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint ./src/**",
+    "test": "jest",
+    "coverage": "npm run test -- --coverage",
+    "debugger": "node --inspect-brk ./node_modules/jest/bin/jest  --runInBand --no-cache --no-watchman",
+    "ci": "npm run coverage"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.16.8",
+    "@babel/preset-env": "7.16.11",
+    "@types/jest": "27.4.0",
+    "jest": "27.4.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xuxihai123/data-structures.git"
+  },
+  "keywords": [
+    "computer-science",
+    "cs",
+    "data-structures",
+    "javascript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xuxihai123/data-structures/issues"
+  },
+  "homepage": "https://github.com/xuxihai123/data-structures#readme"
+}
