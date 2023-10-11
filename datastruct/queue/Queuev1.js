@@ -2,13 +2,16 @@ class Queue {
   constructor() {
     this._space = [];
   }
+  // 入队
   enqueue(val) {
     this._space.push(val);
   }
+  // 出队
   dequeue() {
     const el = this._space.shift();
     return el || null;
   }
+  // 取第一个元素
   peek() {
     const len = this._space.length;
     if (len > 0) {
@@ -17,6 +20,7 @@ class Queue {
       return null;
     }
   }
+  // 判断是否为空
   isEmpty() {
     return this._space.length === 0;
   }

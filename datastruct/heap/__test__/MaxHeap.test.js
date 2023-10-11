@@ -1,5 +1,4 @@
 import MaxHeap from '../MaxHeap';
-import Comparator from '../../../utils/comparator/Comparator';
 
 describe('MaxHeap', () => {
   it('should create an empty max heap', () => {
@@ -158,15 +157,7 @@ describe('MaxHeap', () => {
 
     expect(maxHeap.toString()).toBe('dddd,ccc,bb,a');
 
-    const comparator = new Comparator((a, b) => {
-      if (a.length === b.length) {
-        return 0;
-      }
-
-      return a.length < b.length ? -1 : 1;
-    });
-
-    maxHeap.remove('hey', comparator);
+    maxHeap.remove((temp) => temp.length === 3);
     expect(maxHeap.toString()).toBe('dddd,a,bb');
   });
 });

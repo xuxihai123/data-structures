@@ -1,5 +1,4 @@
 import MinHeap from '../MinHeap';
-import Comparator from '../../../utils/comparator/Comparator';
 
 describe('MinHeap', () => {
   it('should create an empty min heap', () => {
@@ -158,15 +157,7 @@ describe('MinHeap', () => {
 
     expect(minHeap.toString()).toBe('a,bb,ccc,dddd');
 
-    const comparator = new Comparator((a, b) => {
-      if (a.length === b.length) {
-        return 0;
-      }
-
-      return a.length < b.length ? -1 : 1;
-    });
-
-    minHeap.remove('hey', comparator);
+    minHeap.remove((temp) => temp.length === 3);
     expect(minHeap.toString()).toBe('a,bb,dddd');
   });
 

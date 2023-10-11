@@ -1,129 +1,130 @@
-import DoublyLinkedListNode from './DoublyLinkedListNode';
-import Comparator from '../../utils/comparator/Comparator';
+class DoublyLinkedListNode {
+  constructor(val, next, prev) {
+    this.value = val;
+    this.previous = prev || null;
+    this.next = next || null;
+  }
+
+  toString(callback) {
+    return callback ? callback(this.value) : `${this.value}`;
+  }
+}
 class DoublyLinkedList {
-  constructor(compareFn) {
+  constructor() {
     this.head = null;
     this.tail = null;
     this.size = 0;
-    this.compare = new Comparator(compareFn);
   }
 
-  append(val) {
+  insertAfterNode(prevNode, val) {
     var newNode = new DoublyLinkedListNode(val);
-    if (!this.head) {
-      this.head = this.tail = newNode;
-      this.size++;
-      return this;
-    }
+    if (!prevNode) {
+      // 空链表
+      if (!this.head) {
+        this.head = newNode;
+        this.tail = newNode;
+      } else {
+        newNode.next = this.head;
+        this.head.previous = newNode; // more1
+        this.head = newNode;
+      }
+    } else {
+      if (prevNode.next === null) {
+        // 最后一个节点插入. 修正tail指针
+        this.tail = newNode;
+      }
+      newNode.next = prevNode.next;
+      if (prevNode.next) {
+        prevNode.next.previous = newNode; // more2
+      }
 
-    if (!this.tail) {
-      this.tail = newNode;
-      newNode.previous = this.head;
-      this.head.next = newNode;
-      this.size++;
-      return this;
+      prevNode.next = newNode;
+      newNode.previous = prevNode; // more3
     }
-    var last = this.tail;
-    last.next = newNode;
-    newNode.previous = last;
-    this.tail = newNode;
     this.size++;
+  }
+  append(val) {
+    this.insertAfterNode(this.tail, val);
     return this;
   }
 
   prepend(val) {
-    var newNode = new DoublyLinkedListNode(val);
-    if (!this.head) {
-      this.head = this.tail = newNode;
-      this.size++;
-      return this;
-    }
-    this.head.previous = newNode;
-    newNode.next = this.head;
-    this.head = newNode;
-    this.size++;
+    this.insertAfterNode(null, val);
     return this;
   }
 
-  fromArray(list) {
-    for (var i = 0; i < list.length; i++) {
-      this.append(list[i]);
+  removeAfterNode(prevNode, current) {
+    prevNode = current.previous;
+    // current是第一个节点
+    if (prevNode === null) {
+      const first = this.head;
+      this.head = current.next;
+      first.next = null;
+      first.previous = null;
+      // 处理后是空链表,  修正tail指针
+      if (this.head === null) {
+        this.tail = null;
+      } else {
+        this.head.previous = null;
+      }
+    } else {
+      prevNode.next = current.next;
+      if (current.next) {
+        current.next.previous = prevNode; // more2
+      } else {
+        // current是最后一个节点, 修正tail指针
+        this.tail = prevNode;
+      }
+      current.previous = null;
+      current.next = null;
     }
+    this.size--;
   }
 
   delete(val) {
-    if (!this.head) return null;
+    let callback;
+    if (typeof val !== 'function') {
+      callback = (temp) => temp.value === val;
+    } else {
+      callback = val;
+    }
     var current = this.head;
-    var temp;
-    var delNode = null;
+    var target = null;
+    var next = null;
     while (current) {
-      if (this.compare.equal(current.value, val)) {
-        // 尾部的情况
-        if (current.previous && !current.next) {
-          current.previous.next = null;
-          this.tail = current.previous;
-          current.previous = null; //release memeory
-        } else if (current.next && !current.previous) {
-          // 首部的情况
-          current.next.previous = null;
-          this.head = current.next;
-          temp = current;
-          current = current.next; //
-          temp.next = null; //release memeory
-          continue;
-        } else if (current.next === null && current.previous === null) {
-          // 只有一个节点的情况
-          this.head = this.tail = null;
-        } else {
-          // 中间节点
-          current.next.previous = current.previous;
-          current.previous.next = current.next;
-        }
-        this.size--;
-        delNode = current;
+      if (callback(current)) {
+        target = current;
+        next = current.next;
+        this.removeAfterNode(null, current);
+        current = next;
+        continue;
       }
       current = current.next;
     }
-    return delNode;
-  }
-
-  deleteTail() {
-    if (!this.tail) return null;
-    var tail = this.tail;
-    var lastprev = tail.previous;
-    if (!lastprev) {
-      this.head = this.tail = null;
-    } else {
-      lastprev.next = null;
-      this.tail = lastprev;
-    }
-    this.size--;
-    tail.previous = null; // release memory
-    return tail;
+    return target;
   }
 
   deleteHead() {
     if (!this.head) return null;
-    var head = this.head;
-    if (!head.next) {
-      this.head = this.tail = null;
-    } else {
-      head.next.previous = null;
-      this.head = head.next;
-    }
-    this.size--;
-    head.next = null; // release memeory
+    let head = this.head;
+    this.removeAfterNode(null, head);
     return head;
   }
 
-  find({ value, callback }) {
+  deleteTail() {
     if (!this.head) return null;
-    if (!callback) {
-      callback = (nodeValue) => this.compare.equal(nodeValue, value);
-    }
+    let tail = this.tail;
+    this.removeAfterNode(null, tail);
+    return tail;
+  }
+  find(callback) {
+    if (!callback) throw Error('callback is required');
+    if (!this.head) return null;
+
     var current = this.head;
+    var index = 0;
     while (current) {
-      if (callback(current.value)) {
+      if (callback(current, index)) {
         break;
       }
       current = current.next;
@@ -153,6 +154,19 @@ class DoublyLinkedList {
     this.tail = head;
     this.head = tail;
   }
+  clear() {
+    this.head = null;
+    this.tail = null;
+    this.size = 0;
+  }
+  fromArray(list) {
+    for (var i = 0; i < list.length; i++) {
+      this.append(list[i]);
+    }
+  }
+  getSize() {
+    return this.size;
+  }
 
   toString(callback) {
     if (!callback) {
@@ -168,9 +182,15 @@ class DoublyLinkedList {
     return s.join(',');
   }
 
-  getSize() {
-    return this.size;
+  toArray() {
+    var current = this.head;
+    var arr = [];
+    while (current !== null) {
+      arr.push(current.value);
+      current = current.next;
+    }
+    return arr;
   }
 }
 
-export default DoublyLinkedList;
+export { DoublyLinkedList, DoublyLinkedListNode };

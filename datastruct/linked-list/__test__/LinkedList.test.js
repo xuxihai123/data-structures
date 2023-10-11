@@ -1,4 +1,4 @@
-import LinkedList from '../LinkedList';
+import { LinkedList } from '../LinkedList';
 
 describe('LinkedList', () => {
   it('should create empty linked list', () => {
@@ -40,7 +40,9 @@ describe('LinkedList', () => {
     expect(linkedList.tail.toString()).toBe('4');
 
     linkedList.insert(3, 2);
+    expect(linkedList.toString()).toBe('4,3');
     linkedList.insert(2, 1);
+    expect(linkedList.toString()).toBe('4,2,3');
     linkedList.insert(1, -7);
     linkedList.insert(10, 9);
 
@@ -171,30 +173,37 @@ describe('LinkedList', () => {
   it('should find node by value', () => {
     const linkedList = new LinkedList();
 
-    expect(linkedList.find({ value: 5 })).toBeNull();
+    let node = linkedList.find((temp) => temp.value === 5);
+    expect(node).toBeNull();
 
     linkedList.append(1);
-    expect(linkedList.find({ value: 1 })).toBeDefined();
+    let node2 = linkedList.find((temp) => temp.value === 1);
+    expect(node2).toBeDefined();
 
     linkedList.append(2).append(3);
 
-    const node = linkedList.find({ value: 2 });
+    let node3 = linkedList.find((temp) => temp.value === 2);
 
-    expect(node.value).toBe(2);
-    expect(linkedList.find({ value: 5 })).toBeNull();
+    expect(node3.value).toBe(2);
+    let node4 = linkedList.find((temp) => temp.value === 5);
+    expect(node4).toBeNull();
   });
 
   it('should find node by callback', () => {
     const linkedList = new LinkedList();
 
-    linkedList.append({ value: 1, key: 'test1' }).append({ value: 2, key: 'test2' }).append({ value: 3, key: 'test3' });
+    linkedList
+      .append({ value: 1, key: 'test1' })
+      .append({ value: 2, key: 'test2' })
+      .append({ value: 3, key: 'test3' });
 
-    const node = linkedList.find({ callback: (value) => value.key === 'test2' });
+    const node = linkedList.find((temp) => temp.value.key === 'test2');
 
     expect(node).toBeDefined();
     expect(node.value.value).toBe(2);
     expect(node.value.key).toBe('test2');
-    expect(linkedList.find({ callback: (value) => value.key === 'test5' })).toBeNull();
+    const node2 = linkedList.find((temp) => temp.value.key === 'test5');
+    expect(node2).toBeNull();
   });
 
   it('should create linked list from array', () => {
@@ -204,40 +213,32 @@ describe('LinkedList', () => {
     expect(linkedList.toString()).toBe('1,1,2,3,3,3,4,5');
   });
 
-  it('should find node by means of custom compare function', () => {
-    const comparatorFunction = (a, b) => {
-      if (a.customValue === b.customValue) {
-        return 0;
-      }
+  it('should find node by means of custom object', () => {
+    const linkedList = new LinkedList();
 
-      return a.customValue < b.customValue ? -1 : 1;
-    };
+    linkedList
+      .append({ customValue: 'test1' })
+      .append({ customValue: 'test2' })
+      .append({ customValue: 'test3' });
 
-    const linkedList = new LinkedList(comparatorFunction);
-
-    linkedList.append({ value: 1, customValue: 'test1' }).append({ value: 2, customValue: 'test2' }).append({ value: 3, customValue: 'test3' });
-
-    const node = linkedList.find({
-      value: { value: 2, customValue: 'test2' }
+    const node = linkedList.find((temp) => {
+      return temp.value.customValue === 'test2';
     });
 
     expect(node).toBeDefined();
-    expect(node.value.value).toBe(2);
     expect(node.value.customValue).toBe('test2');
-    expect(linkedList.find({ value: { value: 2, customValue: 'test5' } })).toBeNull();
+    const node2 = linkedList.find((temp) => temp.value.customValue === 'test5');
+    expect(node2).toBeNull();
   });
 
-  it('should find preferring callback over compare function', () => {
-    const greaterThan = (value, compareTo) => (value > compareTo ? 0 : 1);
-
-    const linkedList = new LinkedList(greaterThan);
+  it('should find preferring callback', () => {
+    const linkedList = new LinkedList();
     linkedList.fromArray([1, 2, 3, 4, 5]);
 
-    let node = linkedList.find({ value: 3 });
+    let node = linkedList.find((temp) => temp.value === 4);
     expect(node.value).toBe(4);
-
-    node = linkedList.find({ callback: (value) => value < 3 });
-    expect(node.value).toBe(1);
+    let node2 = linkedList.find((temp) => temp.value < 3);
+    expect(node2.value).toBe(1);
   });
 
   it('should convert to array', () => {
@@ -252,7 +253,10 @@ describe('LinkedList', () => {
     const linkedList = new LinkedList();
 
     // Add test values to linked list.
-    linkedList.append(1).append(2).append(3);
+    linkedList
+      .append(1)
+      .append(2)
+      .append(3);
 
     expect(linkedList.toString()).toBe('1,2,3');
     expect(linkedList.head.value).toBe(1);

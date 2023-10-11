@@ -1,4 +1,4 @@
-import LinkedList from '../linked-list/LinkedList';
+import { LinkedList } from '../linked-list/LinkedList';
 
 class HashTable {
   constructor(len) {
@@ -6,12 +6,9 @@ class HashTable {
     this.expansion = 1.5;
     this.buckets = Array(len)
       .fill(null)
-      .map(
-        () =>
-          new LinkedList((a, b) => {
-            return a.key === b ? 0 : -1;
-          })
-      );
+      .map(() => {
+        return new LinkedList();
+      });
   }
 
   resize() {}
@@ -28,7 +25,7 @@ class HashTable {
   get(str) {
     var idx = this.hash(str);
     var linklist = this.buckets[idx];
-    var node = linklist.find({ value: str });
+    var node = linklist.find((temp) => temp.value.key === str);
     if (node) {
       return node.value.value;
     } else {
@@ -40,7 +37,7 @@ class HashTable {
     var idx = this.hash(key);
     // console.log('set:', key, idx);
     var linlst = this.buckets[idx];
-    var node = linlst.find({ value: key });
+    var node = linlst.find((temp) => temp.value.key === key);
     if (!node) {
       linlst.append({ key, value });
     } else {
@@ -55,7 +52,7 @@ class HashTable {
     }
     var idx = this.hash(key);
     var linklist = this.buckets[idx];
-    return linklist.delete(key);
+    return linklist.delete((temp) => temp.value.key === key);
   }
 
   getKeys() {
@@ -84,7 +81,7 @@ class HashTable {
     var idx = this.hash(key);
     var linklist = this.buckets[idx];
 
-    var node = linklist.find({ value: key });
+    var node = linklist.find((temp) => temp.value.key === key);
     // console.log('has:', key, linklist.toArray(), node);
     return node !== null;
   }

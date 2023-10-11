@@ -5,19 +5,21 @@ export default class Stack {
   constructor() {
     this._space = [];
   }
+  // 入栈
   push(element) {
     this._space.push(element);
   }
+  // 出栈
   pop() {
     const element = this._space.pop();
     return element || null;
   }
-
+  // 查看栈顶元素
   peek() {
     const last = this._space[this._space.length - 1];
     return last || null;
   }
-
+  // 是否为空
   isEmpty() {
     return this._space.length === 0;
   }

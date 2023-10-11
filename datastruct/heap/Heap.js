@@ -1,4 +1,3 @@
-import Comparator from '../../utils/comparator/Comparator';
 
 /**
  * |null|10|9|8|7|6...
@@ -6,16 +5,15 @@ import Comparator from '../../utils/comparator/Comparator';
  */
 
 class Heap {
-  constructor(compareFunc) {
+  constructor() {
     this.space = ['INF'];
     if (new.target === Heap) {
       throw Error('cannot to call Heap constructor direct!');
     }
-    this.compare = new Comparator(compareFunc);
   }
   // 比较两个元素
   pairIsInCorrectOrder(firstEl, secondEl) {
-    return this.compare.greaterThan(firstEl, secondEl);
+     throw Error('need implement!')
   }
   /**
    * @param {number} childIndex
@@ -82,14 +80,19 @@ class Heap {
     this.shiftUp();
   }
 
-  remove(val, customComparator) {
-    customComparator = customComparator || this.compare;
+  remove(val) {
+    let callback;
+    if (typeof val !== 'function') {
+      callback = (temp) => temp === val;
+    } else {
+      callback = val;
+    }
     var removeIndex;
     var parentIndex;
-    var count = this.find(val, customComparator).length;
+    var count = this.find(callback).length;
     for (var i = 0; i < count; i++) {
       // 这样处理是因为上浮和下沉会导致索引发生变化, 但是性能也太差了...
-      removeIndex = this.find(val, customComparator).pop();
+      removeIndex = this.find(callback).pop();
       removeIndex = removeIndex + 1;
       // head top
       if (removeIndex === 1) {
@@ -128,10 +131,16 @@ class Heap {
     return extreme;
   }
 
-  find(val, customComparator = this.compare) {
+  find(val) {
+    let callback;
+    if (typeof val !== 'function') {
+      callback = (temp) => temp === val;
+    } else {
+      callback = val;
+    }
     var ret = [];
     for (var i = 1; i < this.space.length; i++) {
-      if (customComparator.equal(this.space[i], val)) {
+      if (callback(this.space[i])) {
         ret.push(i - 1);
       }
     }

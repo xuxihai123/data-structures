@@ -1,13 +1,4 @@
-// import LinkedListNode from '../LinkedListNode';
-
-function LinkedListNode(val, next) {
-  this.value = val;
-  this.next = next || null;
-}
-
-LinkedListNode.prototype.toString = function (callback) {
-  return callback ? callback(this.value) : `${this.value}`;
-};
+import { LinkedListNode } from "../LinkedList";
 
 describe('LinkedListNode', () => {
   it('should create list node with value', () => {
